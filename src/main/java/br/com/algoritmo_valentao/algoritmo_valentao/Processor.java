@@ -14,10 +14,10 @@ public class Processor {
 	private static List<Task> listProcess = new ArrayList<Task>();
 
 	private static void createListProcess() {
-		listProcess.add(new Task(() -> System.out.println("Consultar coordenador"), timeCoord));
-		listProcess.add(new Task(() -> System.out.println("Criar novo processo"), timeNewProcess));
-		listProcess.add(new Task(() -> System.out.println("Remover processo que NÃO seja coordenador"), timeRmProcessNotCoord));
-		listProcess.add(new Task(() -> System.out.println("Remover processo que SEJA coordenador"), timeRmProcessNotCoord));
+		listProcess.add(new Task(() -> System.out.println("Consultar coordenador "+timeCoord), timeCoord));
+		listProcess.add(new Task(() -> System.out.println("Criar novo processo "+timeNewProcess), timeNewProcess));
+		listProcess.add(new Task(() -> System.out.println("Remover processo que NÃO seja coordenador "+timeRmProcessNotCoord), timeRmProcessNotCoord));
+		listProcess.add(new Task(() -> System.out.println("Remover processo que SEJA coordenador "+timeRmProcessCoord), timeRmProcessCoord));
 	}
 	
 	private static void scheduleTasks() {

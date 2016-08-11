@@ -12,6 +12,12 @@ public class Task extends TimerTask {
 		this.time = time;
 	}
 	
+	public Task(Runnable run, Object param, long time) {
+		super();
+		this.run = run;
+		this.time = time;
+	}
+	
 	public long getTime() {
 		return time;
 	}

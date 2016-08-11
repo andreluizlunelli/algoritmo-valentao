@@ -12,12 +12,16 @@ import java.util.Vector;
  */
 public class App 
 {
+	long tempoConsultarCoordenador = 1000 * 2;
+	long tempoCriarNovoProcesso = 1000 * 3;
+	long tempoEliminaProcessoDiferenteCoordenador = 1000 * 5;    	
+	long tempoEliminaProcessoCoordenador = 1000 * 10;
+	Timer timer = new Timer();	
+	
     public static void main(String[] args) {
-    	long tempoConsultarCoordenador = 1000 * 2;
-    	long tempoCriarNovoProcesso = 1000 * 3;
-    	long tempoEliminaProcessoDiferenteCoordenador = 1000 * 5;    	
-    	long tempoEliminaProcessoCoordenador = 1000 * 10;    	
-        Timer timer = new Timer();
+    	criarProcessos();
+    	
+
         TimerTask taskConsultarCoordenador = new TimerTask() {			
 			@Override
 			public void run() {
@@ -25,23 +29,17 @@ public class App
 			}
 		};
 		
-		new TimerTask() {
-			
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				
-			}
-		};
 		
         TimerTask taskCriarNovoProcesso = new TimerTask() {			
 			@Override
 			public void run() {
-				System.out.println("consultar coordenador");
+				System.out.println("criar novo processo");
 			}
 		};
 		timer.scheduleAtFixedRate(taskConsultarCoordenador, tempoConsultarCoordenador, tempoConsultarCoordenador);		
 		timer.scheduleAtFixedRate(taskCriarNovoProcesso, tempoConsultarCoordenador, tempoConsultarCoordenador);
 		
 	}
+    
+    
 }

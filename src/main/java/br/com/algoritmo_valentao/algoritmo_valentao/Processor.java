@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
+import java.util.function.Function;
 
 public class Processor {
 	private static long timeCoord = 1000 * 2;
@@ -11,35 +12,25 @@ public class Processor {
 	private static long timeRmProcessNotCoord = 1000 * 5;
 	private static long timeRmProcessCoord = 1000 * 10;
 	private static final Timer timer = new Timer();
-	private static List<Task> listProcess = new ArrayList<Task>();
+	private static List<Process> listProcess = new ArrayList<Process>();
 
 	private static void createListProcess() {
-		listProcess.add(new Task(() -> System.out.println("Consultar coordenador "+timeCoord), timeCoord));
-		listProcess.add(new Task(() -> System.out.println("Criar novo processo "+timeNewProcess), timeNewProcess));
-		listProcess.add(new Task(() -> System.out.println("Remover processo que NÃO seja coordenador "+timeRmProcessNotCoord), timeRmProcessNotCoord));
-		listProcess.add(new Task(() -> System.out.println("Remover processo que SEJA coordenador "+timeRmProcessCoord), timeRmProcessCoord));
-		listProcess.add(new Task(() -> new Runnable() {		
-			/*
-			 * Usado para finalizar a execução de todas as tasks depois de um minuto
-			 */
-			@Override
-			public void run() {
-				System.out.println("Finaliza tasks");
-				timer.cancel();
-				timer.purge();
-			}
-		}, 1000 * 11));
+		listProcess.add(new Process(() -> out("Consultar coordenador "+timeCoord), timeCoord));
+		listProcess.add(new Process(() -> out("Criar novo processo "+timeNewProcess), timeNewProcess));
+		listProcess.add(new Process(() -> out("Remover processo que NÃO seja coordenador "+timeRmProcessNotCoord), timeRmProcessNotCoord));
+		listProcess.add(new Process(() -> out("Remover processo que SEJA coordenador "+timeRmProcessCoord), timeRmProcessCoord));		
+		Function<Timer, String> xTimer = x -> {x.cancel(); x.purge(); out("Finaliza tasks"); return "";};
+		listProcess.add(new Process(xTimer, timer, 1000 * 11));
 	}
 	
 	private static void scheduleTasks() {
-		for (Task t : listProcess) {
+		for (Process t : listProcess) {
 			timer.scheduleAtFixedRate(t, t.getTime(), t.getTime());				
 		}		
 	}
 	
-	public static void teste() {
-		timer.cancel();
-		timer.purge();
+	private static void out(String s) {
+		System.out.println(s);
 	}
 
 	public static void initProcess() {

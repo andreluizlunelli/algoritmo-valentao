@@ -11,6 +11,7 @@ public class Processor {
 	private static long timeNewProcess = 1000 * 3;
 	private static long timeRmProcessNotCoord = 1000 * 5;
 	private static long timeRmProcessCoord = 1000 * 10;
+	private static long timeCloseAllProcess = 1000 * 60;
 	private static final Timer timer = new Timer();
 	private static List<Process> listProcess = new ArrayList<Process>();
 
@@ -20,7 +21,7 @@ public class Processor {
 		listProcess.add(new Process(() -> out("Remover processo que NÃO seja coordenador "+timeRmProcessNotCoord), timeRmProcessNotCoord));
 		listProcess.add(new Process(() -> out("Remover processo que SEJA coordenador "+timeRmProcessCoord), timeRmProcessCoord));		
 		Function<Timer, String> xTimer = x -> {x.cancel(); x.purge(); out("Finaliza tasks"); return "";};
-		listProcess.add(new Process(xTimer, timer, 1000 * 11));
+		listProcess.add(new Process(xTimer, timer, timeCloseAllProcess));
 	}
 	
 	private static void scheduleTasks() {

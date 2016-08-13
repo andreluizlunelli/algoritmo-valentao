@@ -25,7 +25,7 @@ public class Processor {
 	private void createListProcess() {
 		listProcess.add(new Process(getCloseAllProcessFunction(), timer, timeCloseAllProcess));
 		listProcess.add(new Process(getCoordConsultFunction(), this, timeCoord));
-		listProcess.add(new Process(() -> out("Criar novo processo "+timeNewProcess), timeNewProcess));
+		listProcess.add(new Process(() -> out("Criou processo"), timeNewProcess));
 		listProcess.add(new Process(() -> out("Remover processo que NÃO seja coordenador "+timeRmProcessNotCoord), timeRmProcessNotCoord));
 		listProcess.add(new Process(() -> out("Remover processo que SEJA coordenador "+timeRmProcessCoord), timeRmProcessCoord));				
 	}
@@ -46,15 +46,18 @@ public class Processor {
 			for (Process p : x.listProcess) {
 				if (p.isCoord()) {
 					if (p.respond() != Process.RESPOND_OK) {
-						out("Eleição!");
+						out("nao esta respondendo, Eleição!");
 						break;
 					} else {
+						out(Process.RESPOND_OK);
 						return Process.RESPOND_OK;
 					}
 				}
 			}
 			// se chegou aqui eleição tbm
-			return "nao achado";
+			out("teste elegendo o primeiro!");
+			x.selectFirstCoord();
+			return "";
 		};
 		return xConsult;
 	}

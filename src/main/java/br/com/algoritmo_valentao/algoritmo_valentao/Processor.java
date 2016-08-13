@@ -11,7 +11,7 @@ public class Processor {
 	private long timeNewProcess = 1000 * 3;
 	private long timeRmProcessNotCoord = 1000 * 5;
 	private long timeRmProcessCoord = 1000 * 10;
-	private long timeCloseAllProcess = 1000 * 10;
+	private long timeCloseAllProcess = 1000 * 15;
 	private final Timer timer = new Timer();
 	private List<Process> listProcess = new ArrayList<Process>();
 
@@ -19,21 +19,44 @@ public class Processor {
 		Processor processor = new Processor();
 		processor.createListProcess();
 		processor.scheduleTasks();
-		processor.selectFirstCoord();
-		
-		/* TEM QUE TESTAR NO PC QUE TENHA JAVA8
-		 * NO createListProcess PRECISA ADD UMA Function PEGANDO A POSIÇAO DO COORDENADOR
-		 * NÃO VAI EXISTIR AI, ELE CHAMA O selectFirstCoord
-		 */
+		processor.selectFirstCoord();				
 	}
 
 	private void createListProcess() {
-		listProcess.add(new Process(() -> out("Consultar coordenador "+timeCoord), timeCoord));
+		listProcess.add(new Process(getCloseAllProcessFunction(), timer, timeCloseAllProcess));
+		listProcess.add(new Process(getCoordConsultFunction(), this, timeCoord));
 		listProcess.add(new Process(() -> out("Criar novo processo "+timeNewProcess), timeNewProcess));
 		listProcess.add(new Process(() -> out("Remover processo que NÃO seja coordenador "+timeRmProcessNotCoord), timeRmProcessNotCoord));
-		listProcess.add(new Process(() -> out("Remover processo que SEJA coordenador "+timeRmProcessCoord), timeRmProcessCoord));		
-		Function<Timer, String> xTimer = x -> {x.cancel(); x.purge(); out("Finaliza tasks"); return "";};
-		listProcess.add(new Process(xTimer, timer, timeCloseAllProcess));
+		listProcess.add(new Process(() -> out("Remover processo que SEJA coordenador "+timeRmProcessCoord), timeRmProcessCoord));				
+	}
+	
+	private Function<Timer, String> getCloseAllProcessFunction() {
+		Function<Timer, String> xTimer = x -> {
+			x.cancel(); 
+			x.purge(); 
+			out("F:Finaliza tasks"); 
+			return "";
+		};
+		return xTimer;
+	}
+	
+	private Function<Processor, String> getCoordConsultFunction() {
+		out("F:Consultar coordenador");
+		Function<Processor, String> xConsult = x -> {
+			for (Process p : x.listProcess) {
+				if (p.isCoord()) {
+					if (p.respond() != Process.RESPOND_OK) {
+						out("Eleição!");
+						break;
+					} else {
+						return Process.RESPOND_OK;
+					}
+				}
+			}
+			// se chegou aqui eleição tbm
+			return "nao achado";
+		};
+		return xConsult;
 	}
 	
 	private void scheduleTasks() {

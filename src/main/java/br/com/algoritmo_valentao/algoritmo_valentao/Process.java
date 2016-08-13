@@ -14,25 +14,25 @@ public class Process extends TimerTask {
 	private boolean isCoord; // se é coordenador
 	private boolean isRunning; // se é coordenador	
 	
-	public Process() {
+	private void initProcess() {
 		this.isCoord = false;
-		this.isRunning = false;		
+		this.isRunning = true;		
 	}
 	
 	public Process(Runnable run, long time) {
-		super();
+		this.initProcess();
 		this.run = run;
 		this.time = time;
 	}			
 
 	public Process(Function<Timer, String> xTimer, Timer t, long time) {
-		super();
+		this.initProcess();
 		this.run = () -> xTimer.apply(t);
 		this.time = time;
 	}
 
 	public Process(Function<Processor, String> xProcess, Processor p, long time) {
-		super();
+		this.initProcess();
 		this.run = () -> xProcess.apply(p);
 		this.time = time;
 	}

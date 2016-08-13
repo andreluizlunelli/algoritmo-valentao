@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
+import java.util.Vector;
 import java.util.function.Function;
 
 public class Processor {
@@ -13,7 +14,7 @@ public class Processor {
 	private long timeRmProcessCoord = 1000 * 10;
 	private long timeCloseAllProcess = 1000 * 15;
 	private final Timer timer = new Timer();
-	private List<Process> listProcess = new ArrayList<Process>();
+	private List<Process> listProcess = new Vector<Process>();
 
 	public static void facadeMethod() {
 		Processor processor = new Processor();

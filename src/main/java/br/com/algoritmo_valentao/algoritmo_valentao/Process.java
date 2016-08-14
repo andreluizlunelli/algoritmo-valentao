@@ -23,17 +23,12 @@ public class Process extends TimerTask {
 		this.initProcess();
 		this.run = run;
 		this.time = time;
-	}			
-
-	public Process(Function<Timer, String> xTimer, Timer t, long time) {
+	}				
+	
+	public Process(Object runnable, Object parameter, long time) {
 		this.initProcess();
-		this.run = () -> xTimer.apply(t);
-		this.time = time;
-	}
-
-	public Process(Function<Processor, String> xProcess, Processor p, long time) {
-		this.initProcess();
-		this.run = () -> xProcess.apply(p);
+		Function<Object, Object> f1 = (Function<Object, Object>) runnable;
+		this.run = () -> f1.apply(parameter);
 		this.time = time;
 	}
 

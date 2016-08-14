@@ -8,11 +8,16 @@ import java.util.Vector;
 import java.util.function.Function;
 
 public class Processor {
-	private long timeCoord = 1000 * 2;
-	private long timeNewProcess = 1000 * 3;
-	private long timeRmProcessNotCoord = 1000 * 5;
-	private long timeRmProcessCoord = 1000 * 10;
-	private long timeCloseAllProcess = 1000 * 15;
+	
+	public static void main(String[] args) {
+    	Processor.facadeMethod();
+	}
+	
+	private final long timeCoord = 1000 * 2;
+	private final long timeNewProcess = 1000 * 3;
+	private final long timeRmProcessNotCoord = 1000 * 5;
+	private final long timeRmProcessCoord = 1000 * 10;
+	private final long timeCloseAllProcess = 1000 * 15;
 	private final Timer timer = new Timer();
 	private List<Process> listProcess = new Vector<Process>();
 
@@ -24,10 +29,25 @@ public class Processor {
 	}
 
 	private void createListProcess() {
+		/*
+		 * Processo para finalizar o programa 
+		 */
 		listProcess.add(new Process(getCloseAllProcessFunction(), timer, timeCloseAllProcess));
+		/*
+		 * Processo para consultar o coordenador
+		 */
 		listProcess.add(new Process(getCoordConsultFunction(), this, timeCoord));
-		listProcess.add(new Process(() -> out("Criou processo"), timeNewProcess));
+		/*
+		 * Criar processos aleatórios
+		 */
+		listProcess.add(new Process(getNewProcessFunction(), this.listProcess, timeNewProcess));
+		/*
+		 * Remover processos aleatório que não seja coordenador
+		 */
 		listProcess.add(new Process(() -> out("Remover processo que NÃO seja coordenador "+timeRmProcessNotCoord), timeRmProcessNotCoord));
+		/*
+		 * Remover coordenador
+		 */
 		listProcess.add(new Process(() -> out("Remover processo que SEJA coordenador "+timeRmProcessCoord), timeRmProcessCoord));				
 	}
 	
@@ -55,12 +75,18 @@ public class Processor {
 					}
 				}
 			}
-			// se chegou aqui eleição tbm
-			out("teste elegendo o primeiro!");
-			x.selectFirstCoord();
 			return "";
 		};
 		return xConsult;
+	}
+	
+	private Function<List<Process>, String> getNewProcessFunction() {
+		out("F:Criar novos processos");
+		Function<List<Process>, String> xNewProcess = x -> {
+			x.add(new Process(() -> out("Novo processo"), timeNewProcess));
+			return "";
+		};
+		return xNewProcess;
 	}
 	
 	private void scheduleTasks() {

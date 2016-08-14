@@ -15,4 +15,9 @@ public class Processo {
     public Processo(int id){
         this.id = id;
     }
+    
+    public int getId()
+    {
+        return id;
+    }
 }

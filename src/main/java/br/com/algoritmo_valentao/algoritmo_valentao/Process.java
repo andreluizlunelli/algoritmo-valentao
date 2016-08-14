@@ -16,7 +16,7 @@ public class Process extends TimerTask {
 	
 	private void initProcess() {
 		this.isCoord = false;
-		this.isRunning = true;		
+		this.isRunning = true;				
 	}
 	
 	public Process(Runnable run, long time) {
@@ -39,12 +39,7 @@ public class Process extends TimerTask {
 	
 	public void stop() {
 		this.isRunning = false;
-		try {
-			this.run.wait();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}		
+		this.cancel();		
 	}
 	
 	public String respond() {
@@ -91,8 +86,12 @@ public class Process extends TimerTask {
 		return isRunning;
 	}
 
-	public void setRunning(boolean isRunning) {
-		this.isRunning = isRunning;
+	public void setRunningTrue() {
+		this.isRunning = true;
+	}
+	
+	public void setRunningFalse() {
+		this.isRunning = false;
 	}
 	
 }

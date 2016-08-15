@@ -50,17 +50,19 @@ public class App
                         );
                     }
                     
-                    coordenador = processos.get(random.nextInt(processos.size()));
-                    System.out.println("\nEleito coordenador id#"+coordenador.getId());
+                    elegerCoordenador();
                 }
                 
                 /**
-                 * Tarefas a serem executadas em determinados intervalos
+                 * processo aleatório consulta o coordenador
                  */
                 if (task2 == 2)
                 {                    
                     task2 = 0;
                 }
+                /**
+                 * novo	processo	é criado
+                 */
                 if (task3 == 3)
                 {
                     task3 = 0;
@@ -69,13 +71,25 @@ public class App
                     processos.add(processo);
                     System.out.println("\nCriado processo id#"+processo.getId());
                 }
-                else if (task5 == 5)
+                /**
+                 * processo	aleatório	(sem	ser	o	coordenador)	é eliminado
+                 */
+                if (task5 == 5)
                 {
-                    
+                    eliminarProcessoAleatorio();
                     task5 = 0;
                 }
-                else if (task10 == 10)
+                /**
+                 * 	coordenador	é desativado
+                 */
+                if (task10 == 10)
                 {
+                    Processo desativado = desativarCoordenador();
+                    
+                    if (desativado != null)
+                    {
+                        System.out.println("\nCoordenador id#"+desativado.getId()+" desativado");
+                    }
                     
                     task10 = 0;
                 }
@@ -108,10 +122,65 @@ public class App
         );
     }
     
-    public Processo elegerCoordenador()
+    public void elegerCoordenador()
     {
+        int max = 0;
+        for (int p = 0; p < processos.size(); p++)
+        {
+            Processo processo = processos.get(p);
+            
+            if (processo.getId() > max)
+            {
+                coordenador = processo;
+            }
+        }
+        
+        System.out.println("\nEleito coordenador id#"+coordenador.getId());
+    }   
+    
+    public Processo desativarCoordenador()
+    {
+        Processo tmp = coordenador;
+        coordenador = null;
+        
+        if (tmp != null)
+        {
+            for (int p = 0; p < processos.size(); p++)
+            {
+                if (processos.get(p).getId() == tmp.getId())
+                {
+                    processos.remove(p);
+                    return tmp;
+                }
+            }
+        }
         return null;
-    }    
+    }
+    
+    public int numeroAleatorio()
+    {
+        return random.nextInt(((processos.size() - 1) - 0) + 1) + 0;
+    }
+    
+    public void eliminarProcessoAleatorio()
+    {
+        int n = numeroAleatorio();
+        Processo tmp = processos.get(n);
+        
+        if (coordenador != null)
+        {
+            while (tmp.getId() == coordenador.getId())
+            {
+                n = numeroAleatorio();
+                tmp = processos.get(n);
+            }
+        }
+        
+        processos.remove(n);
+        
+        System.out.println("\nProcesso id#"+tmp.getId()+" removido");
+         
+    }
 
     public static void main(String args[]) {
         new App();

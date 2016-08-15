@@ -19,7 +19,7 @@ public class Processor {
 	private final long timeNewProcess = 1000 * 3;
 	private final long timeRmProcessNotCoord = 1000 * 5;
 	private final long timeRmProcessCoord = 1000 * 10;
-	private final long timeCloseAllProcess = 1000 * 20;
+	private final long timeCloseAllProcess = 1000 * 60;
 	private final Timer timer = new Timer();
 	private final List<Process> listProcess = new Vector<Process>();
 
@@ -69,31 +69,38 @@ public class Processor {
 		return xTimer;
 	}
 	
-	private Function<Processor, String> getCoordConsultFunction() {
+	private FunctionConsulta<Processor, Process, String> getCoordConsultFunction() {
 		out("TimerTask:Consultar coordenador");
-		Function<Processor, String> xConsult = x -> {
-			int i = 0;
-			for (Process p : x.listProcess) {
-				if (p.isCoord()) {
-					if (p.respond() != Process.RESPOND_OK) {
-						out("nao esta respondendo, Eleição!");
-						x.election(null, null); // TODO TEM QUE PEGAR O PROCESSO QUE CHAMOU ESSA FUNÇÃO
+		FunctionConsulta<Processor, Process, String> xConsult = (processor, process) -> {			
+				for (Process p : processor.listProcess) {
+					if (p.isCoord()) {
+						continue;
+					}				
+					Process coord =	processor.getListCoord();
+					if (coord.respond() != Process.RESPOND_OK) {
+						out("Nao esta respondendo, Eleição!");
+						coord.setCoordFalse();
+						
+						coord = new Election(p, processor).election();
+						if (coord.respond() != Process.RESPOND_OK) {
+							out("Novo processo coordenador "+coord.getId());
+						} else {
+							out("Ocorreu algo errado");
+						}
 					} else {
-						out("Processo "+i+" "+Process.RESPOND_OK);
+						out("Processo "+p.getId()+" "+Process.RESPOND_OK);
 					}
 					break;
 				}
-				i++;
-			}
-			return "";
+				return "";
 		};
 		return xConsult;
 	}
 	
 	private Function<List<Process>, String> getNewProcessFunction() {
 		out("TimerTask:Criar novos processos");
-		Function<List<Process>, String> xNewProcess = x -> { // preciso passar mais uma função aqui
-			int id = x.size()+1;
+		Function<List<Process>, String> xNewProcess = x -> {
+			int id = x.size();
 			out(String.format("Novo processo:%d", id));
 			Process p = new Process(getCoordConsultFunction(), this, timeNewProcess);
 			p.setId(id);
@@ -164,18 +171,21 @@ public class Processor {
 	}
 	
 	private Process getListCoord() {
-		int i = 0;
 		for (Process process : listProcess) {
-			if (process.isRunning() && process.isCoord()) {
-				process.setId(i);
+			if (process.isCoord()) {
 				return process;
 			}
-			i++;
 		}
 		return null;
 	}
 	
-	private Process election(Process consultationProcess, Processor processor) {
-		return null;
+	public List<Process> getListProcess() {
+		return listProcess;
 	}
+
+	@FunctionalInterface
+    interface FunctionConsulta <A, B, R> { 
+        public R apply (A a, B b);
+    }
+
 }

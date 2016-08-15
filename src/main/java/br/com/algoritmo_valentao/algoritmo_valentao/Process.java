@@ -1,8 +1,11 @@
 package br.com.algoritmo_valentao.algoritmo_valentao;
 
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.function.Function;
+
+import br.com.algoritmo_valentao.algoritmo_valentao.Processor.FunctionConsulta;
 
 public class Process extends TimerTask {
 	public static final String RESPOND_OK = "Ok";
@@ -22,6 +25,13 @@ public class Process extends TimerTask {
 	public Process(Runnable run, long time) {
 		this.initProcess();
 		this.run = run;
+		this.time = time;
+	}				
+	
+	public Process(FunctionConsulta run, Processor processor, long time) {
+		this.initProcess();
+		FunctionConsulta<Processor, Process, String> fconsulta = run;
+		this.run = () -> fconsulta.apply(processor, this);
 		this.time = time;
 	}				
 	
@@ -93,5 +103,14 @@ public class Process extends TimerTask {
 	public void setRunningFalse() {
 		this.isRunning = false;
 	}
-	
+
+	/**
+	 * Se o numero do random for par, retorna true
+	 * @return
+	 */
+	public boolean isWantBeCoor() {
+		Random random = new Random();
+		int n = random.nextInt();
+		return (n % 2) == 0; 
+	}
 }

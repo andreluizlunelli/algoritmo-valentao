@@ -41,10 +41,6 @@ public class Processor {
 		 */
 		schedule(new Process(getCoordConsultFunction(), this, timeCoord));
 		/*
-		 * Criar processos aleatórios
-		 */
-		addProcessOnList(new Process(getNewProcessFunction(), this.listProcess, timeNewProcess));
-		/*
 		 * Remover processos aleatório que não seja coordenador
 		 */
 		schedule(new Process(getRmProcessNotCoordFunction(), this, timeRmProcessNotCoord));
@@ -52,6 +48,10 @@ public class Processor {
 		 * Remover coordenador
 		 */
 		schedule(new Process(getRmCoordProcessFunction(), this, timeRmProcessCoord));				
+		/*
+		 * Criar processos aleatórios
+		 */
+		addProcessOnList(new Process(getNewProcessFunction(), this.listProcess, timeNewProcess));
 	}
 	
 	private synchronized void addProcessOnList(Process p) {
@@ -77,7 +77,7 @@ public class Processor {
 				if (p.isCoord()) {
 					if (p.respond() != Process.RESPOND_OK) {
 						out("nao esta respondendo, Eleição!");
-						x.election(); // TODO TEM QUE PEGAR O PROCESSO QUE CHAMOU ESSA FUNÇÃO
+						x.election(null, null); // TODO TEM QUE PEGAR O PROCESSO QUE CHAMOU ESSA FUNÇÃO
 					} else {
 						out("Processo "+i+" "+Process.RESPOND_OK);
 					}
@@ -92,9 +92,11 @@ public class Processor {
 	
 	private Function<List<Process>, String> getNewProcessFunction() {
 		out("TimerTask:Criar novos processos");
-		Function<List<Process>, String> xNewProcess = x -> {
-			out(String.format("Novo processo:%d", (x.size()+1)));
+		Function<List<Process>, String> xNewProcess = x -> { // preciso passar mais uma função aqui
+			int id = x.size()+1;
+			out(String.format("Novo processo:%d", id));
 			Process p = new Process(getCoordConsultFunction(), this, timeNewProcess);
+			p.setId(id);
 			x.add(p);
 			schedule(p);
 			return "";
@@ -174,6 +176,6 @@ public class Processor {
 	}
 	
 	private Process election(Process consultationProcess, Processor processor) {
-		
+		return null;
 	}
 }

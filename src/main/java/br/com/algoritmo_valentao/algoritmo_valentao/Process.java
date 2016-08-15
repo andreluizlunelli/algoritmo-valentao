@@ -12,7 +12,7 @@ public class Process extends TimerTask {
 	private Runnable run;
 	private long time;
 	private boolean isCoord; // se é coordenador
-	private boolean isRunning; // se é coordenador	
+	private boolean isRunning; 	
 	
 	private void initProcess() {
 		this.isCoord = false;

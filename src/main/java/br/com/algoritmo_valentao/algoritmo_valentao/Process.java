@@ -113,4 +113,11 @@ public class Process extends TimerTask {
 		int n = random.nextInt();
 		return (n % 2) == 0; 
 	}
+
+	@Override
+	public String toString() {
+		return "Process [id=" + id + ", run=" + run + ", time=" + time + ", isCoord=" + isCoord + ", isRunning="
+				+ isRunning + "]";
+	}
+	
 }

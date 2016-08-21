@@ -23,6 +23,8 @@ public class App
     int task5 = 0;
     int task10 = 0;
     
+    int id = 1;
+    
     ArrayList<Processo> processos = new ArrayList<Processo>();
     Processo coordenador;
     Random random = new Random();
@@ -57,8 +59,10 @@ public class App
                  * processo aleatório consulta o coordenador
                  */
                 if (task2 == 2)
-                {                    
+                {   
                     task2 = 0;
+                    
+                    consultarCoordenador();
                 }
                 /**
                  * novo	processo	é criado
@@ -84,12 +88,7 @@ public class App
                  */
                 if (task10 == 10)
                 {
-                    Processo desativado = desativarCoordenador();
-                    
-                    if (desativado != null)
-                    {
-                        System.out.println("\nCoordenador id#"+desativado.getId()+" desativado");
-                    }
+                    desativarCoordenador();
                     
                     task10 = 0;
                 }
@@ -117,9 +116,7 @@ public class App
     
     public Processo criarProcesso()
     {
-        return new Processo(
-            this.random.nextInt()
-        );
+        return new Processo(id++);
     }
     
     public void elegerCoordenador()
@@ -150,6 +147,7 @@ public class App
                 if (processos.get(p).getId() == tmp.getId())
                 {
                     processos.remove(p);
+                    System.out.println("\nCoordenador id#"+tmp.getId()+" desativado");
                     return tmp;
                 }
             }
@@ -180,6 +178,21 @@ public class App
         
         System.out.println("\nProcesso id#"+tmp.getId()+" removido");
          
+    }
+    
+    public void consultarCoordenador()
+    {
+        System.out.println("\nConsultando coordenador");
+        
+        if (coordenador != null)
+        {
+            System.out.println("\nCoordenador id#"+coordenador.getId()+" respondeu OK");
+        }
+        else 
+        {
+            System.out.println("\nCoordenador não respondeu - Iniciando nova eleição");
+            elegerCoordenador();
+        }
     }
 
     public static void main(String args[]) {

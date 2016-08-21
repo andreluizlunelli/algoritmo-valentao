@@ -46,7 +46,10 @@ public class Process extends TimerTask {
 
 	public void run() {
 		setRunningTrue();
+//		System.out.println("teste---");
 		this.run.run();
+//		System.out.println(this.run.getClass().toString());
+//		System.out.println("--- fim teste");
 	}
 	
 	public void stop() {

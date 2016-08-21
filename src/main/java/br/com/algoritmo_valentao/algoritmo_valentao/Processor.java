@@ -18,8 +18,6 @@ public class Processor {
 	 * TODO O coordenador está se consultando, certo ou errado? n sei
 	 * 
 	 * TODO está consultando o coordenador 2x
-	 * 
-	 * TODO não posso parar um processo que já está parado
 	 */
 
 	public static void main(String[] args) {
@@ -57,12 +55,15 @@ public class Processor {
 		 * Criar processos aleatórios
 		 */
 		schedule(new Process(getNewProcessFunction(), this, timeNewProcess));
-
-		schedule(new Process(getTESTConsultFunction(), this, timeCoordConsult));
+		/*
+		 * Processo para consultar o coordenador
+		 */
+		schedule(new Process(getExecConsultFunction(), this, timeCoordConsult));
 	}
 
-	private FunctionConsulta<Processor, Process, String> getTESTConsultFunction() {
+	private FunctionConsulta<Processor, Process, String> getExecConsultFunction() {
 		FunctionConsulta<Processor, Process, String> xConsult = (processor, process) -> {
+			out("TimerTask:Executar busca e chama funcao para consultar coordenador");
 			Process pRandom = processor.getRandomConsultProcess();
 			if (pRandom == null) {
 				return null;
@@ -86,7 +87,7 @@ public class Processor {
 			out("TimerTask:Fechar toda aplicacao");
 			x.cancel();
 			x.purge();
-			out("F:Finaliza tasks");
+			out("Finalizado com sucesso");
 			return "";
 		};
 		return xTimer;
@@ -121,9 +122,6 @@ public class Processor {
 			out("TimerTask:Criar novo processo");
 			int id = x.getListProcess().size();
 			out(String.format("Novo processo:%d", id));
-			/*
-			 * Processo para consultar o coordenador
-			 */
 			Process p = new Process(getCoordConsultFunction(), this, timeCoordConsult);
 			p.setId(id);
 			x.addProcessOnList(p);

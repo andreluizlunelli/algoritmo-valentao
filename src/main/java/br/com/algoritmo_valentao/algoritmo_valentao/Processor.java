@@ -11,6 +11,10 @@ import java.util.function.Function;
 
 public class Processor {
 
+	/* TODO 
+	 * 	Fazer metodo para dar um dump na classe Processor para olhar como esta os valores e qual o tempo sendo executado 
+	 */
+	
 	public static void main(String[] args) {
 		Processor.facadeMethod();
 	}
@@ -46,6 +50,21 @@ public class Processor {
 		 * Criar processos aleatórios
 		 */
 		schedule(new Process(getNewProcessFunction(), this, timeNewProcess));
+		
+		schedule(new Process(getTESTConsultFunction(), this, timeCoordConsult));
+	}
+
+	private FunctionConsulta<Processor, Process, String> getTESTConsultFunction() {
+		FunctionConsulta<Processor, Process, String> xConsult = (processor, process) -> {			
+			Process pRandom = processor.getRandomConsultProcess();
+			if (pRandom == null) {
+				return null;
+			}
+			Runnable run2 = pRandom.getRun();
+			run2.run();
+			return "";
+		};
+		return xConsult;
 	}
 
 	private synchronized void addProcessOnList(Process p) {
@@ -66,36 +85,22 @@ public class Processor {
 	private FunctionConsulta<Processor, Process, String> getCoordConsultFunction() {
 		FunctionConsulta<Processor, Process, String> xConsult = (processor, process) -> {
 			out("TimerTask:Consultar coordenador");
-			synchronized (processor) {				
-				for (Process p : processor.getListProcess()) {
-					if (p.isCoord()) {
-						continue;
-					}
-					Process coord = processor.getCoordFromListProcessor();
-					if (coord == null) {
-						out("coordenador null, Eleição!");
-						coord = new Election(p, processor).election();
-						if (coord.respond() == Process.RESPOND_OK) {
-							out("Novo processo coordenador " + coord.getId());
-						} else {
-							out("Ocorreu algo errado"+coord.toString());
-						}
-					} else if (coord.respond() != Process.RESPOND_OK) {
-						out("Nao esta respondendo, Eleição!");
-						coord.setCoordFalse();
-						coord = new Election(p, processor).election();
-						if (coord.respond() == Process.RESPOND_OK) {
-							out("Novo processo coordenador " + coord.getId());
-						} else {
-							out("Ocorreu algo errado"+coord.toString());
-						}
-					} else {
-						out("Processo " + p.getId() + " " + Process.RESPOND_OK);
-					}
-					break;
+			Process coord = processor.getCoordFromListProcessor();
+			if (coord == null || (coord.respond() != Process.RESPOND_OK)) {
+				out("Nao esta respondendo, Eleição!");
+				if (coord != null) {
+					coord.setCoordFalse();					
 				}
-				return "";
-			}
+				coord = new Election(process, processor).election();
+				if (coord.respond() == Process.RESPOND_OK) {
+					out("Novo processo coordenador " + coord.getId());
+				} else {
+					out("Ocorreu algo errado" + coord.toString());
+				}
+			} else {
+				out("Processo " + process.getId() + " consultou coordenador: "+ coord.getId() + " " + Process.RESPOND_OK);
+			}			
+			return "";
 		};
 		return xConsult;
 	}
@@ -111,7 +116,6 @@ public class Processor {
 			Process p = new Process(getCoordConsultFunction(), this, timeCoordConsult);
 			p.setId(id);
 			x.addProcessOnList(p);
-			schedule(p);
 			return "";
 		};
 		return xNewProcess;
@@ -120,6 +124,10 @@ public class Processor {
 	private Function<Processor, String> getRmProcessNotCoordFunction() {
 		Function<Processor, String> xRmProcess = x -> {
 			out("TimerTask:Remover processo que não é coordenador");
+			if (x.getListProcess().size() < 2) {
+				out("Só tem um processo na lista, não remove");
+				return "";
+			}
 			Process processStopped = null;
 			int n;
 			do {
@@ -160,25 +168,6 @@ public class Processor {
 		System.out.println(s);
 	}
 
-	/**
-	 * TODO metodo não está tratando se, houver outro coordenador, ele não
-	 * pesquisa p remover, tem que pesquisar e remover
-	 * 
-	 * @param index
-	 */
-	private void selectCoord(int index) {
-		Process process = listProcess.get(index);
-		if (!process.isRunning()) {
-			return;
-		}
-		process.setCoordTrue();
-		listProcess.set(index, process);
-	}
-
-	private void selectFirstCoord() {
-		this.selectCoord(0);
-	}
-
 	private Process getCoordFromListProcessor() {
 		for (Process process : this.getListProcess()) {
 			if (process.isCoord()) {
@@ -192,6 +181,27 @@ public class Processor {
 		return listProcess;
 	}
 
+	private Process getRandomConsultProcess() {
+		if (getListProcess().size() == 0) {
+			out("Opa! Lista vazia!");
+			return null;
+		} else if (getListProcess().size() == 1) {
+			out("Só tem um elemento!");
+			return getListProcess().get(0);
+		}
+		Process returnn = null;
+		do {
+			int randomIndex = getIntBetween(0, (getListProcess().size()-1));
+			returnn = getListProcess().get(randomIndex);			
+		} while (returnn == null && (!returnn.isCoord() && returnn.isRunning()));
+		return returnn;
+	}
+
+	Random random = new Random();
+	private int getIntBetween(int min, int max) {
+		return random.nextInt((max + 1) - min) + min;
+	}
+	
 	@FunctionalInterface
 	interface FunctionConsulta<A, B, R> {
 		public R apply(A a, B b);

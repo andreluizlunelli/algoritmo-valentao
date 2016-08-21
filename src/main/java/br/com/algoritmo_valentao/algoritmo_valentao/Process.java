@@ -31,7 +31,9 @@ public class Process extends TimerTask {
 	public Process(FunctionConsulta run, Processor processor, long time) {
 		this.initProcess();
 		FunctionConsulta<Processor, Process, String> fconsulta = run;
-		this.run = () -> fconsulta.apply(processor, this);
+		if (run != null) {
+			this.run = () -> fconsulta.apply(processor, this);			
+		}
 		this.time = time;
 	}				
 	

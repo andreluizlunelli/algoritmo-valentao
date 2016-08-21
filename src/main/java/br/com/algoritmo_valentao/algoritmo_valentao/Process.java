@@ -45,12 +45,13 @@ public class Process extends TimerTask {
 	}
 
 	public void run() {
-		this.isRunning = true;
+		setRunningTrue();
 		this.run.run();
 	}
 	
 	public void stop() {
-		this.isRunning = false;
+		setRunningFalse();
+		setCoordFalse();
 		this.cancel();		
 	}
 	

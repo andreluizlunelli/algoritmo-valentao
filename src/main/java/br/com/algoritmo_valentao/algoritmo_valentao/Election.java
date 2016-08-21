@@ -17,8 +17,11 @@ public class Election {
 	public Process election() {
 		Process coord = null;
 		for (Process p : processor.getListProcess()) {
-			if (callToElection.getId() < p.getId() ) { // se tiver processos maiores que o chamador, ele faz o convite p se tornar coordenador
-				if (p.isWantBeCoor()) {
+			/*
+			 * se tiver processos maiores que o chamador, ele faz o convite p se tornar coordenador
+			 */
+			if (callToElection.getId() < p.getId() ) { 
+				if (p.isWantBeCoor() && p.isRunning()) {
 					addWant(p);
 				}
 			} 
@@ -26,8 +29,12 @@ public class Election {
 		if (wantBeCoord.size() > 1) {
 			coord = getProcessWithMajorID();
 		} else {
-//			se no final das contas não tiver um coordenador, o callToElection se devolve como coordenador
-			if (coord == null) {
+			/*
+			 * se no final das contas não tiver um coordenador, o callToElection se devolve como coordenador
+			 */
+			if (wantBeCoord.size() == 1) {
+				coord = wantBeCoord.get(0);
+			} else if (coord == null) {
 				coord = callToElection;
 			}		
 		}

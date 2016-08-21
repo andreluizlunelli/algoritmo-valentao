@@ -11,10 +11,17 @@ import java.util.function.Function;
 
 public class Processor {
 
-	/* TODO 
-	 * 	Fazer metodo para dar um dump na classe Processor para olhar como esta os valores e qual o tempo sendo executado 
+	/*
+	 * TODO Fazer metodo para dar um dump na classe Processor para olhar como
+	 * esta os valores e qual o tempo sendo executado
+	 * 
+	 * TODO O coordenador está se consultando, certo ou errado? n sei
+	 * 
+	 * TODO está consultando o coordenador 2x
+	 * 
+	 * TODO não posso parar um processo que já está parado
 	 */
-	
+
 	public static void main(String[] args) {
 		Processor.facadeMethod();
 	}
@@ -33,7 +40,7 @@ public class Processor {
 	}
 
 	private void createProcess() {
-
+		out("Início");
 		/*
 		 * Processo para finalizar o programa
 		 */
@@ -50,18 +57,21 @@ public class Processor {
 		 * Criar processos aleatórios
 		 */
 		schedule(new Process(getNewProcessFunction(), this, timeNewProcess));
-		
+
 		schedule(new Process(getTESTConsultFunction(), this, timeCoordConsult));
 	}
 
 	private FunctionConsulta<Processor, Process, String> getTESTConsultFunction() {
-		FunctionConsulta<Processor, Process, String> xConsult = (processor, process) -> {			
+		FunctionConsulta<Processor, Process, String> xConsult = (processor, process) -> {
 			Process pRandom = processor.getRandomConsultProcess();
 			if (pRandom == null) {
 				return null;
+			} else if (!pRandom.isRunning()) {
+				out("Ops! Não pode ser um processo nulo");
 			}
 			Runnable run2 = pRandom.getRun();
-			run2.run();
+			run2.run(); // aqui chama a função dentro do
+						// getCoordConsultFunction()
 			return "";
 		};
 		return xConsult;
@@ -89,7 +99,7 @@ public class Processor {
 			if (coord == null || (coord.respond() != Process.RESPOND_OK)) {
 				out("Nao esta respondendo, Eleição!");
 				if (coord != null) {
-					coord.setCoordFalse();					
+					coord.setCoordFalse();
 				}
 				coord = new Election(process, processor).election();
 				if (coord.respond() == Process.RESPOND_OK) {
@@ -98,8 +108,9 @@ public class Processor {
 					out("Ocorreu algo errado" + coord.toString());
 				}
 			} else {
-				out("Processo " + process.getId() + " consultou coordenador: "+ coord.getId() + " " + Process.RESPOND_OK);
-			}			
+				out("Processo " + process.getId() + " consultou coordenador: " + coord.getId() + " "
+						+ Process.RESPOND_OK);
+			}
 			return "";
 		};
 		return xConsult;
@@ -134,8 +145,14 @@ public class Processor {
 				Random random = new Random();
 				n = random.nextInt(x.getListProcess().size());
 				processStopped = x.getListProcess().get(n);
-			} while (processStopped.isCoord()); // se n for coordenador pode
-												// matar
+				
+				// se n for coordenador nem estiver parado, pode matar 
+				if (processStopped.isCoord()) {
+					processStopped = null;
+				} else if (!processStopped.isRunning()) {
+					processStopped = null;
+				}
+			} while (processStopped == null); 
 			out(String.format("Processo parado:%d", n));
 			processStopped.stop();
 			return "";
@@ -187,21 +204,31 @@ public class Processor {
 			return null;
 		} else if (getListProcess().size() == 1) {
 			out("Só tem um elemento!");
-			return getListProcess().get(0);
+			Process isRunning = getListProcess().get(0);
+			if (isRunning.isRunning())
+				return isRunning;
+			else
+				return null;
 		}
 		Process returnn = null;
 		do {
-			int randomIndex = getIntBetween(0, (getListProcess().size()-1));
-			returnn = getListProcess().get(randomIndex);			
-		} while (returnn == null && (!returnn.isCoord() && returnn.isRunning()));
+			int randomIndex = getIntBetween(0, (getListProcess().size() - 1));
+			returnn = getListProcess().get(randomIndex);
+			if (returnn.isCoord()) {
+				returnn = null;
+			} else if (!returnn.isRunning()) {
+				returnn = null;
+			}
+		} while (returnn == null);
 		return returnn;
 	}
 
 	Random random = new Random();
+
 	private int getIntBetween(int min, int max) {
 		return random.nextInt((max + 1) - min) + min;
 	}
-	
+
 	@FunctionalInterface
 	interface FunctionConsulta<A, B, R> {
 		public R apply(A a, B b);

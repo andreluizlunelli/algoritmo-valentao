@@ -16,8 +16,6 @@ public class Processor {
 	 * esta os valores e qual o tempo sendo executado
 	 * 
 	 * TODO O coordenador está se consultando, certo ou errado? n sei
-	 * 
-	 * TODO está consultando o coordenador 2x
 	 */
 
 	public static void main(String[] args) {
@@ -28,7 +26,7 @@ public class Processor {
 	private final long timeNewProcess = 1000 * 3;
 	private final long timeRmProcessNotCoord = 1000 * 5;
 	private final long timeRmProcessCoord = 1000 * 10;
-	private final long timeCloseAllProcess = 1000 * 30;
+	private final long timeCloseAllProcess = 1000 * 60;
 	private final Timer timer = new Timer();
 	private final List<Process> listProcess = new Vector<Process>();
 
